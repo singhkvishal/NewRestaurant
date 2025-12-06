@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Your Cart - Test Delight</title>
+    <th:block layout:fragment="head">
+        <style>
+            .cart-item {
+                transition: all 0.3s ease;
+            }
+            .cart-item:hover {
+                background-color: #f8f9fa;
+            }
+            .quantity-btn {
+                width: 30px;
+                height: 30px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            .quantity-input {
+                width: 50px;
+                text-align: center;
+                margin: 0 5px;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content" class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <h2 class="mb-4">Your Order</h2>
+                
+                <div th:if="${not #lists.isEmpty(cartItems)}" class="card">
+                    <div class="card-body p-0">
+                        <div th:each="item : ${cartItems}" class="cart-item p-3 border-bottom">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <img th:src="${item.menuItem.imageUrl}" 
+                                         th:alt="${item.menuItem.name}"
+                                         class="img-fluid rounded" 
+                                         style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 class="mb-1" th:text="${item.menuItem.name}"></h5>
+                                    <p class="text-muted mb-0" th:text="'$' + ${#numbers.formatDecimal(item.menuItem.price, 1, 2)} + ' each'"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <form th:action="@{/cart/update}" method="post" class="d-inline">
+                                        <input type="hidden" name="menuItemId" th:value="${item.menuItem.id}">
+                                        <div class="input-group input-group-sm">
+                                            <button type="button" class="btn btn-outline-secondary quantity-btn" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
+                                            <input type="number" name="quantity" th:value="${item.quantity}" min="1" class="form-control quantity-input">
+                                            <button type="button" class="btn btn-outline-secondary quantity-btn" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
+                                            <button type="submit" class="btn btn-link text-primary ms-2">Update</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <span class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span>
+                                    <form th:action="@{/cart/remove}" method="post" class="d-inline ms-2">
+                                        <input type="hidden" name="menuItemId" th:value="${item.menuItem.id}">
+                                        <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Remove">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(cartItems)}" class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+                    <h4>Your cart is empty</h4>
+                    <p class="text-muted">Looks like you haven't added anything to your cart yet.</p>
+                    <a th:href="@{/menu}" class="btn btn-primary">Browse Menu</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Summary</h5>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2" th:each="item : ${cartItems}">
+                            <span th:text="${item.menuItem.name} + ' x ' + ${item.quantity}"></span>
+                            <span th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}"></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total</span>
+                            <span th:text="'$' + ${#numbers.formatDecimal(cartTotal, 1, 2)}"></span>
+                        </div>
+                        <a th:href="@{/checkout}" class="btn btn-primary w-100 mt-3" th:classappend="${#lists.isEmpty(cartItems)} ? 'disabled' : ''">
+                            Proceed to Checkout
+                        </a>
+                        <a th:href="@{/menu}" class="btn btn-outline-secondary w-100 mt-2">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="scripts">
+        <script>
+            // Handle quantity input validation
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.value < 1) this.value = 1;
+                });
+            });
+            
+            // Show success message if redirected from adding an item
+            if (window.location.search.includes('addedToCart')) {
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 m-3 p-3 bg-success text-white rounded';
+                toast.style.zIndex = '1100';
+                toast.innerHTML = 'Item added to cart!';
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        </script>
+    </th:block>
+</body>
+</html>

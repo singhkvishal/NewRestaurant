@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Payment - Test  Delight</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .payment-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        #payment-message {
+            display: none;
+            margin-top: 1rem;
+        }
+        #card-element {
+            margin: 1rem 0;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+        }
+        .payment-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="payment-container">
+            <h2 class="text-center mb-4">Complete Your Reservation</h2>
+            <p class="text-center">Please enter your payment details to secure your reservation.</p>
+            
+            <div class="payment-amount text-center">
+                Total Amount: $<span th:text="${#numbers.formatDecimal(amount, 1, 2)}">0.00</span>
+            </div>
+            
+            <form id="payment-form">
+                <div id="card-element">
+                    <!-- Elements will create form elements here -->
+                </div>
+                
+                <div id="card-errors" role="alert" class="text-danger"></div>
+                
+                <div class="d-grid gap-2 mt-4">
+                    <button id="submit" class="btn btn-primary btn-lg">
+                        <span id="button-text">Pay Now</span>
+                        <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+                
+                <div id="payment-message" class="alert" role="alert"></div>
+            </form>
+            
+            <div class="text-center mt-4">
+                <a href="/reservations" class="btn btn-link">← Back to Reservations</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Stripe with your publishable key
+        const stripe = Stripe('[[${stripePublicKey}]]');
+        const elements = stripe.elements();
+        const card = elements.create('card');
+        
+        card.mount('#card-element');
+        
+        // Handle real-time validation errors from the card Element
+        card.on('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const submitButton = document.getElementById('submit');
+            const spinner = document.querySelector('#spinner');
+            const buttonText = document.querySelector('#button-text');
+            const paymentMessage = document.getElementById('payment-message');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            spinner.classList.remove('d-none');
+            buttonText.textContent = 'Processing...';
+            paymentMessage.textContent = '';
+            paymentMessage.className = 'alert';
+            
+            try {
+                const {error, paymentIntent} = await stripe.confirmCardPayment(
+                    '[[${clientSecret}]]', {
+                        payment_method: {
+                            card: card,
+                            billing_details: {
+                                name: 'Customer Name' // You can customize this
+                            }
+                        }
+                    }
+                );
+                
+                if (error) {
+                    // Show error to customer
+                    paymentMessage.textContent = error.message || 'An error occurred';
+                    paymentMessage.className = 'alert alert-danger';
+                    paymentMessage.style.display = 'block';
+                } else if (paymentIntent.status === 'succeeded') {
+                    // Show success message
+                    paymentMessage.textContent = 'Payment successful! Your reservation is confirmed.';
+                    paymentMessage.className = 'alert alert-success';
+                    paymentMessage.style.display = 'block';
+                    
+                    // Redirect to confirmation page after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/reservations/confirmation';
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                paymentMessage.textContent = 'An unexpected error occurred. Please try again.';
+                paymentMessage.className = 'alert alert-danger';
+                paymentMessage.style.display = 'block';
+            } finally {
+                submitButton.disabled = false;
+                spinner.classList.add('d-none');
+                buttonText.textContent = 'Pay Now';
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

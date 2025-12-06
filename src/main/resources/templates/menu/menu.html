@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Our Menu</title>
+    <th:block layout:fragment="head">
+        <meta name="description" content="Explore our delicious menu featuring a variety of dishes made with fresh, locally-sourced ingredients.">
+        <style>
+            .menu-category {
+                margin-bottom: 3rem;
+            }
+            .menu-category h2 {
+                color: var(--primary-color);
+                border-bottom: 2px solid var(--accent-color);
+                padding-bottom: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .menu-item {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #eee;
+            }
+            .menu-item:last-child {
+                border-bottom: none;
+            }
+            .menu-item h4 {
+                color: var(--dark-color);
+                margin-bottom: 0.25rem;
+            }
+            .menu-item .description {
+                color: #666;
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+            .menu-item .price {
+                color: var(--primary-color);
+                font-weight: bold;
+            }
+            .category-nav {
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #eee;
+            }
+            .category-nav a {
+                margin-right: 1rem;
+                color: var(--dark-color);
+                text-decoration: none;
+            }
+            .category-nav a:hover, .category-nav a.active {
+                color: var(--primary-color);
+                font-weight: bold;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <section class="menu-section py-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">Our Menu</h1>
+                    <p class="lead">Discover our selection of delicious dishes made with the finest ingredients</p>
+                </div>
+                
+                <!-- Category Navigation -->
+                <div class="category-nav">
+                    <a href="/menu" th:classappend="${currentCategory == null ? 'active' : ''}">All Categories</a>
+                    <a th:each="category : ${categories}" 
+                       th:href="${'/menu/category/' + category}"
+                       th:text="${category}"
+                       th:classappend="${currentCategory == category ? 'active' : ''}"></a>
+                </div>
+                
+                <!-- Menu Items -->
+                <div th:if="${!menuItemsByCategory.isEmpty()}">
+                    <div class="menu-category" th:each="entry : ${menuItemsByCategory}">
+                        <h2 th:text="${entry.key}">Category</h2>
+                        <div th:each="item : ${entry.value}" class="menu-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 th:text="${item.name}">Item Name</h4>
+                                    <p class="description" th:text="${item.description}">Item description goes here</p>
+                                </div>
+                                <div class="price" th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${menuItemsByCategory.isEmpty()}" class="text-center py-5">
+                    <p class="lead">No menu items found in this category.</p>
+                    <a href="/menu" class="btn btn-primary">View All Menu Items</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

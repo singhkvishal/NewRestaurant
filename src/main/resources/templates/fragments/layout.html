@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Delight | <th:block layout:title-pattern="$CONTENT_TITLE"></th:block></title>
+    
+    <!-- Bootstrap CSS -->
+    <link th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link th:href="@{/webjars/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    
+    <th:block layout:fragment="head"></th:block>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">Test Delight</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" 
+                           th:classappend="${currentPath != null && currentPath == '/' ? 'active' : ''}" 
+                           th:href="@{/}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" 
+                           th:classappend="${currentPath != null && currentPath.startsWith('/menu') ? 'active' : ''}" 
+                           th:href="@{/menu}">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" 
+                           th:classappend="${currentPath != null && currentPath.startsWith('/reviews') ? 'active' : ''}" 
+                           th:href="@{/reviews}">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" 
+                           th:classappend="${currentPath != null && currentPath == '/about' ? 'active' : ''}" 
+                           th:href="@{/about}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" 
+                           th:classappend="${currentPath == '/contact' ? 'active' : ''}" 
+                           th:href="@{/contact}">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <form class="d-flex me-3" th:action="@{/menu/search}" method="get">
+                        <input class="form-control me-2" type="search" name="query" placeholder="Search menu..." aria-label="Search">
+                        <button class="btn btn-outline-light" type="submit">Search</button>
+                    </form>
+                    <a th:href="@{/cart}" class="btn btn-outline-light position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:if="${@cartService.getItemCount() > 0}" 
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span th:text="${@cartService.getItemCount()}"></span>
+                            <span class="visually-hidden">items in cart</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main role="main" class="container mt-5 pt-4">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div layout:fragment="content">
+            <!-- Page content will be inserted here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Test Delight</h5>
+                    <p>Experience the finest dining with our exquisite menu and exceptional service.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Opening Hours</h5>
+                    <p>Monday - Friday: 11:00 AM - 10:00 PM<br>
+                    Saturday - Sunday: 10:00 AM - 11:00 PM</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p>123 Test Street<br>
+                    Foodie City, FC 12345<br>
+                    Phone: (555) 123-4567<br>
+                    Email: info@gourmetdelight.com</p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Test Delight. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/main.js}"></script>
+    
+    <th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

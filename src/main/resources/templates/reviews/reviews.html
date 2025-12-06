@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Customer Reviews - Test  Delight</title>
+    <meta name="description" content="Read what our customers say about their dining experience at Test  Delight.">
+    
+    <th:block layout:fragment="head">
+        <style>
+            .reviews-hero {
+                background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/restaurant-dining.jpg');
+                background-size: cover;
+                background-position: center;
+                color: white;
+                padding: 6rem 0;
+                margin-bottom: 3rem;
+            }
+            
+            .review-card {
+                border: none;
+                border-radius: 8px;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0,0.1);
+                transition: transform 0.3s ease;
+                height: 100%;
+                margin-bottom: 1.5rem;
+            }
+            
+            .review-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .review-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+            
+            .reviewer-info {
+                display: flex;
+                align-items: center;
+            }
+            
+            .reviewer-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background-color: #f8f9fa;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 1rem;
+                font-size: 1.5rem;
+                color: #6c757d;
+            }
+            
+            .reviewer-name {
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+            }
+            
+            .review-date {
+                font-size: 0.85rem;
+                color: #6c757d;
+            }
+            
+            .rating {
+                color: #ffc107;
+                font-size: 1.25rem;
+            }
+            
+            .review-content {
+                color: #495057;
+                line-height: 1.7;
+            }
+            
+            .no-reviews {
+                padding: 3rem 0;
+                text-align: center;
+            }
+            
+            .average-rating {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #343a40;
+            }
+            
+            .total-reviews {
+                color: #6c757d;
+                margin-bottom: 2rem;
+            }
+            
+            .rating-breakdown {
+                margin-bottom: 2rem;
+            }
+            
+            .rating-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            .rating-label {
+                width: 80px;
+                margin-right: 1rem;
+            }
+            
+            .rating-bar {
+                flex-grow: 1;
+                height: 8px;
+                background-color: #e9ecef;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            
+            .rating-fill {
+                height: 100%;
+                background-color: #ffc107;
+            }
+            
+            .rating-count {
+                width: 30px;
+                text-align: right;
+                margin-left: 1rem;
+                color: #6c757d;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Hero Section -->
+        <section class="reviews-hero text-center">
+            <div class="container">
+                <h1 class="display-4 fw-bold">Customer Reviews</h1>
+                <p class="lead">See what our guests are saying about their dining experience</p>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Reviews List -->
+                    <div class="col-lg-8">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Latest Reviews</h2>
+                            <a href="/reviews/submit" class="btn btn-primary">Write a Review</a>
+                        </div>
+                        
+                        <!-- Success Message -->
+                        <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+                        
+                        <div th:if="${reviews != null and !reviews.empty}">
+                            <div th:each="review : ${reviews}" class="card mb-4">
+                                <div class="card-body">
+                                    <div class="review-header">
+                                        <div class="reviewer-info">
+                                            <div class="reviewer-avatar" style="background-color: #007bff; color: white;">
+                                                <span th:text="${review.customerName != null ? review.customerName.substring(0, 1).toUpperCase() : 'U'}"></span>
+                                            </div>
+                                            <div>
+                                                <div class="reviewer-name" th:text="${review.customerName != null ? review.customerName : 'Anonymous'}">Anonymous</div>
+                                                <div class="review-date" th:if="${review.datePosted != null}" 
+                                                     th:text="${#temporals.format(review.datePosted, 'MMMM d, yyyy')}"></div>
+                                            </div>
+                                        </div>
+                                        <div class="rating" th:attr="title='Rating: ' + ${review.rating} + ' out of 5 stars'">
+                                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                <i th:class="${i <= (review.rating != null ? review.rating : 0) ? 'fas fa-star text-warning' : 'far fa-star text-muted'}"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="review-content mt-3" th:if="${review.comment != null and !review.comment.isEmpty()}" th:text="${review.comment}"></div>
+                                    <div class="review-content mt-3 text-muted" th:if="${review.comment == null or review.comment.isEmpty()}">
+                                        No review text provided.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${reviews == null or #lists.isEmpty(reviews)}" class="no-reviews text-center py-5">
+                            <i class="far fa-comment-alt fa-4x mb-3 text-muted"></i>
+                            <h3>No Reviews Yet</h3>
+                            <p class="lead">Be the first to share your experience!</p>
+                            <a href="/reviews/submit" class="btn btn-primary mt-3">Write a Review</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar with Rating Summary -->
+                    <div class="col-lg-4">
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <h3 class="mb-3">Overall Rating</h3>
+                                <div class="average-rating mb-2">
+                                    <h2 class="display-4 fw-bold" th:text="${averageRating != null ? #numbers.formatDecimal(averageRating, 1, 1) : '0.0'}">0.0</h2>
+                                </div>
+                                <div class="mb-3">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i th:class="${(averageRating != null and i <= averageRating) ? 'fas fa-star text-warning' : 'far fa-star text-muted'}"></i>
+                                    </span>
+                                </div>
+                                <div class="total-reviews">
+                                    <span th:text="${reviews != null ? reviews.size() : 0}"></span> reviews
+                                </div>
+                                
+                                <div class="rating-breakdown mt-4">
+                                    <div class="rating-row" th:each="i : ${#numbers.sequence(5, 1, -1)}">
+                                        <div class="rating-label">
+                                            <span th:text="${i}"></span> <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="rating-bar">
+                                            <div class="rating-fill" th:style="'width: ' + ${reviews != null ? (#lists.size(reviews.stream().filter(r -> r.rating == i).toList()) / reviews.size() * 100) : 0} + '%'"></div>
+                                        </div>
+                                        <div class="rating-count" th:text="${reviews != null ? #lists.size(reviews.stream().filter(r -> r.rating == i).toList()) : 0}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Share Your Experience</h4>
+                                <p>We value your feedback! Let us know about your dining experience at Test  Delight.</p>
+                                <a href="/reviews/submit" class="btn btn-primary w-100">Write a Review</a>
+                                
+                                <hr class="my-4">
+                                
+                                <h5>Review Guidelines</h5>
+                                <ul class="list-unstyled small text-muted">
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Be specific about your experience</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Mention your favorite dishes</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Keep it honest and respectful</li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> No personal information</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <th:block layout:fragment="scripts">
+        <!-- Additional scripts can be added here if needed -->
+    </th:block>
+</body>
+</html>

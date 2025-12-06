@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Submit a Review - Test Delight</title>
+    <th:block layout:fragment="head">
+        <style>
+            .review-form {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 2rem;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            }
+            .rating {
+                display: flex;
+                flex-direction: row-reverse;
+                justify-content: flex-end;
+                margin: 1rem 0;
+            }
+            .rating input {
+                display: none;
+            }
+            .rating label {
+                font-size: 2rem;
+                color: #ddd;
+                cursor: pointer;
+                padding: 0 5px;
+            }
+            .rating label:hover,
+            .rating label:hover ~ label,
+            .rating input:checked ~ label {
+                color: #ffd700;
+            }
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            .btn-submit {
+                background-color: var(--primary-color);
+                color: white;
+                padding: 0.5rem 2rem;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .btn-submit:hover {
+                background-color: var(--dark-color);
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <section class="py-5">
+            <div class="container">
+                <div class="review-form">
+                    <h2 class="text-center mb-4">Write a Review</h2>
+                    
+                    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+                    <form th:action="@{/reviews/submit}" method="post" th:object="${review}">
+                        <div class="form-group">
+                            <label for="customerName">Your Name</label>
+                            <input type="text" class="form-control" id="customerName" th:field="*{customerName}" required>
+                            <small class="text-danger" th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}"></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                            <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Rating</label>
+                            <div class="rating">
+                                <input type="radio" id="star5" name="rating" th:value="5" th:field="*{rating}">
+                                <label for="star5">★</label>
+                                <input type="radio" id="star4" name="rating" th:value="4" th:field="*{rating}">
+                                <label for="star4">★</label>
+                                <input type="radio" id="star3" name="rating" th:value="3" th:field="*{rating}">
+                                <label for="star3">★</label>
+                                <input type="radio" id="star2" name="rating" th:value="2" th:field="*{rating}">
+                                <label for="star2">★</label>
+                                <input type="radio" id="star1" name="rating" th:value="1" th:field="*{rating}" required>
+                                <label for="star1">★</label>
+                            </div>
+                            <small class="text-danger" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="comment">Your Review</label>
+                            <textarea class="form-control" id="comment" th:field="*{comment}" rows="5" required></textarea>
+                            <small class="text-danger" th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}"></small>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-submit">Submit Review</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

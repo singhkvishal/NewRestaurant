@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Search Results - Test Delight</title>
+    <th:block layout:fragment="head">
+        <style>
+            .search-header {
+                background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/search-bg.jpg');
+                background-size: cover;
+                background-position: center;
+                color: white;
+                padding: 5rem 0;
+                margin-bottom: 3rem;
+                text-align: center;
+            }
+            
+            .search-results-count {
+                font-size: 1.2rem;
+                color: #6c757d;
+                margin-bottom: 2rem;
+            }
+            
+            .menu-item-card {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                height: 100%;
+            }
+            
+            .menu-item-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            }
+            
+            .menu-item-img {
+                height: 200px;
+                object-fit: cover;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Search Header -->
+        <section class="search-header">
+            <div class="container">
+                <h1 class="display-5 fw-bold">Search Results</h1>
+                <p class="lead">You searched for: <span th:text="${searchQuery}" class="fw-bold"></span></p>
+                
+                <!-- Search Form -->
+                <div class="row justify-content-center mt-4">
+                    <div class="col-lg-8">
+                        <form th:action="@{/menu/search}" method="get" class="d-flex">
+                            <input type="search" name="query" class="form-control form-control-lg" 
+                                   th:value="${searchQuery}" placeholder="Search our menu..." required>
+                            <button class="btn btn-primary ms-2" type="submit">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Results -->
+        <section class="py-5">
+            <div class="container">
+                <div th:if="${menuItems != null and !menuItems.empty}">
+                    <div class="search-results-count mb-4">
+                        Found <span th:text="${menuItems.size()}"></span> results for "<span th:text="${searchQuery}"></span>"
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div th:each="item : ${menuItems}" class="col-md-6 col-lg-4">
+                            <div class="card menu-item-card h-100">
+                                <img th:src="${item.imageUrl}" class="card-img-top menu-item-img" th:alt="${item.name}">
+                                <div class="card-body">
+                                    <h5 class="card-title" th:text="${item.name}"></h5>
+                                    <p class="card-text text-muted" th:text="${item.description}"></p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 mb-0 text-primary" th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}"></span>
+                                        <a th:href="@{/menu/item/} + ${item.id}" class="btn btn-outline-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${menuItems == null or menuItems.empty}" class="text-center py-5">
+                    <div class="alert alert-info">
+                        <h4>No results found</h4>
+                        <p>We couldn't find any menu items matching "<span th:text="${searchQuery}"></span>". Please try a different search term.</p>
+                        <a th:href="@{/menu}" class="btn btn-primary mt-3">View Full Menu</a>
+                    </div>
+                </div>
+                
+                <!-- Categories Section -->
+                <div class="mt-5">
+                    <h3 class="mb-4">Browse Categories</h3>
+                    <div class="row g-3">
+                        <div th:each="category : ${categories}" class="col-6 col-md-4 col-lg-3">
+                            <a th:href="@{/menu/category/} + ${#strings.toLowerCase(category).replace(' ', '-')}" 
+                               class="btn btn-outline-secondary w-100 text-start">
+                                <i class="fas fa-utensils me-2"></i>
+                                <span th:text="${category}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <th:block layout:fragment="scripts">
+        <script>
+            // Add any additional JavaScript for search functionality here
+            document.addEventListener('DOMContentLoaded', function() {
+                // Focus the search input on page load
+                const searchInput = document.querySelector('input[name="query"]');
+                if (searchInput) {
+                    searchInput.focus();
+                    // Select the text for easy re-searching
+                    searchInput.select();
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

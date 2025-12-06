@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="footer">
+<footer class="bg-dark text-white mt-5">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Restaurant</h5>
+                <p>Delicious food in a cozy atmosphere</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a th:href="@{/}" class="text-white">Home</a></li>
+                    <li><a th:href="@{/menu}" class="text-white">Menu</a></li>
+                    <li><a th:href="@{/about}" class="text-white">About Us</a></li>
+                    <li><a th:href="@{/contact}" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <p>123 Restaurant St.<br>Foodie City, FC 12345<br>Phone: (123) 456-7890<br>Email: info@restaurant.com</p>
+            </div>
+        </div>
+        <div class="text-center mt-3 pt-3 border-top border-secondary">
+            <p class="mb-0">&copy; 2025 Restaurant. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+</html>
