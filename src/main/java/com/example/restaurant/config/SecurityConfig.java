@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +24,7 @@ public class SecurityConfig {
                 auth.requestMatchers("/", "/menu/**", "/about", "/contact", 
                                   "/login", "/register", "/error",
                                   "/reviews", "/reviews/**",
+                                  "/order/**", "/reservations/**",
                                   "/css/**", "/js/**", "/images/**", "/webjars/**",
                                   "/h2-console/**",
                                   "/*.css", "/*.js", "/*.png", "/*.jpg", "/*.jpeg", "/*.gif", "/*.svg", "/*.ico")
@@ -43,7 +45,10 @@ public class SecurityConfig {
                 .authorities("ROLE_ANONYMOUS")
                 .key("anonymousKey")
             )
-            .csrf(csrf -> csrf.disable()) // For H2 console and development only
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/h2-console/**") // Disable CSRF for H2 console
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Enable CSRF with cookie storage
+            )
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin()) // For H2 console
                 .httpStrictTransportSecurity(hsts -> hsts.disable()))

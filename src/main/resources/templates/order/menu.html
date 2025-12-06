@@ -95,8 +95,13 @@
                         <h5 id="cart-total">$0.00</h5>
                     </div>
                     <form id="order-form" th:action="@{/order/checkout}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <div id="form-inputs"></div>
-                        <button type="submit" class="btn btn-primary w-100" id="checkout-btn" disabled>
+                        <div th:if="${param.error != null}" class="alert alert-danger mt-2" role="alert">
+                            <span th:if="${param.error == 'empty_cart'}">Please add items to your cart before checking out.</span>
+                            <span th:if="${param.error == 'error'}">An error occurred. Please try again.</span>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-2" id="checkout-btn" disabled>
                             Proceed to Checkout
                         </button>
                     </form>
@@ -115,19 +120,23 @@
             <th:block th:each="item : ${menuItems}">
                 [[${item.id}]]: {
                     id: [[${item.id}]],
-                    name: '[[${item.name}]]',
+                    name: '[[${#strings.escapeJavaScript(item.name)}]]',
                     price: [[${item.price}]]
                 },
             </th:block>
         };
 
         // Update quantity input and cart
-        function updateQuantity(inputId, change) {
+        function updateQuantity(inputId, change, event) {
+            if (event) {
+                event.preventDefault();
+            }
             const input = document.getElementById(inputId);
             let value = parseInt(input.value) + change;
             value = Math.max(0, Math.min(20, value)); // Keep between 0 and 20
             input.value = value;
             updateCart();
+            return false;
         }
 
         // Update cart summary
@@ -139,27 +148,32 @@
             
             // Get all quantity inputs
             document.querySelectorAll('input[type="number"]').forEach(input => {
-                const quantity = parseInt(input.value);
-                if (quantity > 0) {
-                    const itemId = input.id.replace('item_', '');
-                    const item = menuItems[itemId];
-                    const itemTotal = (item.price * quantity).toFixed(2);
-                    
-                    total += parseFloat(itemTotal);
-                    hasItems = true;
-                    
-                    // Add to cart items
-                    cartItems.push(`
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>${item.name} x${quantity}</span>
-                            <span>$${itemTotal}</span>
-                        </div>
-                    `);
-                    
-                    // Add hidden input for form submission
-                    formInputs.push(`
-                        <input type="hidden" name="item_${itemId}" value="${quantity}">
-                    `);
+                try {
+                    const quantity = parseInt(input.value) || 0;
+                    if (quantity > 0) {
+                        const itemId = input.id.replace('item_', '');
+                        const item = menuItems[itemId];
+                        if (item) {
+                            const itemTotal = (item.price * quantity).toFixed(2);
+                            total += parseFloat(itemTotal);
+                            hasItems = true;
+                            
+                            // Add to cart items
+                            cartItems.push(`
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>${item.name} x${quantity}</span>
+                                    <span>$${itemTotal}</span>
+                                </div>
+                            `);
+                            
+                            // Add hidden input for form submission
+                            formInputs.push(`
+                                <input type="hidden" name="item_${itemId}" value="${quantity}">
+                            `);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error processing item:', e);
                 }
             });
             
@@ -182,6 +196,25 @@
             }
         }
         
+        // Handle form submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Make sure we have items in the cart
+            const hasItems = Array.from(document.querySelectorAll('input[type="number"]')).some(
+                input => parseInt(input.value) > 0
+            );
+            
+            if (!hasItems) {
+                window.location.href = '/order/menu?error=empty_cart';
+                return false;
+            }
+            
+            // Submit the form
+            this.submit();
+            return false;
+        }
+        
         // Initialize cart
         document.addEventListener('DOMContentLoaded', function() {
             // Update cart when page loads
@@ -190,6 +223,21 @@
             // Update cart when inputs change
             document.querySelectorAll('input[type="number"]').forEach(input => {
                 input.addEventListener('change', updateCart);
+                input.addEventListener('input', updateCart);
+            });
+            
+            // Add form submission handler
+            const orderForm = document.getElementById('order-form');
+            if (orderForm) {
+                orderForm.addEventListener('submit', handleFormSubmit);
+            }
+            
+            // Prevent form submission on enter key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    return false;
+                }
             });
         });
     </script>
