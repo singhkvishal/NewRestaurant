@@ -1,13 +1,13 @@
 package com.example.restaurant.controller;
 
-import com.example.restaurant.model.MenuItem;
 import com.example.restaurant.service.CartService;
 import com.example.restaurant.service.MenuService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/cart")
@@ -47,5 +47,32 @@ public class CartController {
     public String removeFromCart(@RequestParam Long menuItemId) {
         cartService.removeItem(menuItemId);
         return "redirect:/cart";
+    }
+
+    /**
+     * Synchronize the session cart with a full set of item_* quantities.
+     * This is used by the /order/menu page to keep the cart in sync via AJAX.
+     */
+    @PostMapping("/sync")
+    @ResponseBody
+    public ResponseEntity<Void> syncCart(@RequestParam Map<String, String> allParams) {
+        // Clear existing cart
+        cartService.clear();
+
+        // Rebuild from incoming quantities
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("item_")) {
+                Long itemId = Long.parseLong(key.substring(5));
+                int quantity = Integer.parseInt(entry.getValue());
+                if (quantity > 0) {
+                    menuService.getMenuItemById(itemId).ifPresent(menuItem ->
+                        cartService.addItem(menuItem, quantity)
+                    );
+                }
+            }
+        }
+
+        return ResponseEntity.ok().build();
     }
 }

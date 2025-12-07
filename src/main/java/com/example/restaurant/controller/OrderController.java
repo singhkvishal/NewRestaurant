@@ -4,6 +4,7 @@ import com.example.restaurant.model.MenuItem;
 import com.example.restaurant.model.Order;
 import com.example.restaurant.service.MenuService;
 import com.example.restaurant.service.OrderService;
+import com.example.restaurant.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,11 +22,13 @@ public class OrderController {
 
     private final OrderService orderService;
     private final MenuService menuService;
+    private final CartService cartService;
 
     @Autowired
-    public OrderController(OrderService orderService, MenuService menuService) {
+    public OrderController(OrderService orderService, MenuService menuService, CartService cartService) {
         this.orderService = orderService;
         this.menuService = menuService;
+        this.cartService = cartService;
     }
 
     @GetMapping("/menu")
@@ -98,6 +101,35 @@ public class OrderController {
         
         Order savedOrder = orderService.createOrder(order, itemsWithQuantities);
         return "redirect:/order/confirmation/" + savedOrder.getId();
+    }
+
+    /**
+     * Sync items selected on the /order/menu page into the session CartService
+     * and then redirect to the unified checkout flow at /checkout.
+     */
+    @PostMapping("/sync-cart")
+    public String syncCart(@RequestParam Map<String, String> allParams) {
+        // Clear existing cart to reflect current selection
+        cartService.clear();
+
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("item_")) {
+                Long itemId = Long.parseLong(key.substring(5));
+                int quantity = Integer.parseInt(entry.getValue());
+                if (quantity > 0) {
+                    menuService.getMenuItemById(itemId).ifPresent(menuItem ->
+                        cartService.addItem(menuItem, quantity)
+                    );
+                }
+            }
+        }
+
+        if (cartService.getItems().isEmpty()) {
+            return "redirect:/order/menu?error=empty_cart";
+        }
+
+        return "redirect:/checkout";
     }
 
     @GetMapping("/confirmation/{orderId}")
