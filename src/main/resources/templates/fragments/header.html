@@ -10,20 +10,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" th:classappend="${#request.getRequestURI() == '/' ? 'active' : ''}" 
-                           th:href="@{/}">Home</a>
+                        <a class="nav-link" th:href="@{/}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:classappend="${#request.getRequestURI().startsWith('/menu') ? 'active' : ''}" 
-                           th:href="@{/menu}">Menu</a>
+                        <a class="nav-link" th:href="@{/menu}">Menu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:classappend="${#request.getRequestURI() == '/about' ? 'active' : ''}" 
-                           th:href="@{/about}">About</a>
+                        <a class="nav-link" th:href="@{/about}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:classappend="${#request.getRequestURI() == '/contact' ? 'active' : ''}" 
-                           th:href="@{/contact}">Contact</a>
+                        <a class="nav-link" th:href="@{/contact}">Contact</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

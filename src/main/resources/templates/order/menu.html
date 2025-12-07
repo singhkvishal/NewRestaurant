@@ -221,23 +221,34 @@
                 return false;
             }
             
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
             // Check if user is authenticated
-            fetch('/api/check-auth')
-                .then(response => {
-                    if (response.ok) {
-                        // User is authenticated, proceed to checkout
-                        prepareAndSubmitCheckoutForm();
-                    } else {
-                        // User is not authenticated, redirect to login with redirect URL
-                        const currentUrl = window.location.pathname + (window.location.search || '');
-                        window.location.href = '/login?redirect=' + encodeURIComponent(currentUrl);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking authentication:', error);
+            fetch('/api/check-auth', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // User is authenticated, proceed to checkout
+                    prepareAndSubmitCheckoutForm();
+                } else {
+                    // User is not authenticated, redirect to login with redirect URL
                     const currentUrl = window.location.pathname + (window.location.search || '');
                     window.location.href = '/login?redirect=' + encodeURIComponent(currentUrl);
-                });
+                }
+            })
+            .catch(error => {
+                console.error('Error checking authentication:', error);
+                const currentUrl = window.location.pathname + (window.location.search || '');
+                window.location.href = '/login?redirect=' + encodeURIComponent(currentUrl);
+            });
             
             return false;
         }

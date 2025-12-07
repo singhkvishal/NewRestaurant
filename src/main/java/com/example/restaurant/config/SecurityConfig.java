@@ -42,8 +42,8 @@ public class SecurityConfig {
                     .requestMatchers(apiEndpoints).permitAll()
                     .requestMatchers("/order/checkout").authenticated()
                     .requestMatchers("/cart/checkout").authenticated()
-                    .requestMatchers("/order/**").permitAll()
-                    .requestMatchers("/cart/view").authenticated()
+                    .requestMatchers("/order/place").authenticated()
+                    .requestMatchers("/order/confirmation/**").permitAll()
                     .anyRequest().authenticated();
             })
             .formLogin(form -> form
@@ -83,9 +83,7 @@ public class SecurityConfig {
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
-                    "/h2-console/**",
-                    "/order/**",
-                    "/reservations/**"
+                    "/h2-console/**"
                 )
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )

@@ -46,21 +46,33 @@
             color: red;
             margin-bottom: 15px;
         }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
     </style>
 </head>
 <body>
-    <div th:replace="~{fragments/header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
     
     <div class="login-container">
         <h2>Login</h2>
-        <div th:if="${param.error}" class="error">
+        <div th:if="${param.error != null}" class="error">
             <p>Invalid username or password.</p>
             <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
         </div>
-        <div th:if="${param.logout}" class="alert alert-success">
+        <div th:if="${param.logout != null}" class="alert alert-success">
             You have been logged out successfully.
         </div>
         <form th:action="@{/login}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required autofocus>
@@ -78,6 +90,6 @@
         </div>
     </div>
     
-    <div th:replace="~{fragments/footer}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
