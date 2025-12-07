@@ -54,10 +54,11 @@
     <div class="login-container">
         <h2>Login</h2>
         <div th:if="${param.error}" class="error">
-            Invalid username or password.
+            <p>Invalid username or password.</p>
+            <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
         </div>
-        <div th:if="${param.logout}">
-            You have been logged out.
+        <div th:if="${param.logout}" class="alert alert-success">
+            You have been logged out successfully.
         </div>
         <form th:action="@{/login}" method="post">
             <div class="form-group">

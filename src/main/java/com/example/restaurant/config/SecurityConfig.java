@@ -21,20 +21,56 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> {
-                auth.requestMatchers("/", "/menu/**", "/about", "/contact", 
-                                  "/login", "/register", "/error",
-                                  "/reviews", "/reviews/**",
-                                  "/order/**", "/reservations/**",
-                                  "/css/**", "/js/**", "/images/**", "/webjars/**",
-                                  "/h2-console/**",
-                                  "/*.css", "/*.js", "/*.png", "/*.jpg", "/*.jpeg", "/*.gif", "/*.svg", "/*.ico")
-                    .permitAll()
+                // Define public paths
+                String[] publicPaths = {
+                    "/", "/index", "/menu", "/menu/**", "/about", "/contact",
+                    "/login", "/login/**", "/register", "/register/**", "/error",
+                    "/reviews", "/reviews/**",
+                    "/order/menu", "/order/menu/**", "/reservations/**",
+                    "/cart/**", "/cart/add/**", "/cart/remove/**", "/cart/update/**",
+                    "/css/**", "/js/**", "/images/**", "/webjars/**",
+                    "/h2-console/**"
+                };
+                
+                // Define API endpoints
+                String[] apiEndpoints = {
+                    "/api/check-auth"
+                };
+                
+                // Configure security rules
+                auth.requestMatchers(publicPaths).permitAll()
+                    .requestMatchers(apiEndpoints).permitAll()
+                    .requestMatchers("/order/checkout").authenticated()
+                    .requestMatchers("/cart/checkout").authenticated()
+                    .requestMatchers("/order/**").permitAll()
+                    .requestMatchers("/cart/view").authenticated()
                     .anyRequest().authenticated();
             })
             .formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/menu", true)
+                .loginProcessingUrl("/login")
+                .successHandler((request, response, authentication) -> {
+                    // Handle successful authentication
+                    String redirectUrl = request.getParameter("redirect");
+                    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                        response.sendRedirect(redirectUrl);
+                    } else {
+                        response.sendRedirect("/menu");
+                    }
+                })
+                .failureUrl("/login?error=true")
                 .permitAll()
+            )
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint((request, response, authException) -> {
+                    // Redirect to login page with redirect URL for unauthenticated access to protected resources
+                    String redirectUrl = request.getRequestURI();
+                    if (request.getQueryString() != null) {
+                        redirectUrl += "?" + request.getQueryString();
+                    }
+                    response.sendRedirect("/login?redirect=" + java.net.URLEncoder.encode(redirectUrl, "UTF-8"));
+                })
             )
             .logout(logout -> 
                 logout.logoutSuccessUrl("/")
@@ -46,8 +82,12 @@ public class SecurityConfig {
                 .key("anonymousKey")
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**") // Disable CSRF for H2 console
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Enable CSRF with cookie storage
+                .ignoringRequestMatchers(
+                    "/h2-console/**",
+                    "/order/**",
+                    "/reservations/**"
+                )
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin()) // For H2 console

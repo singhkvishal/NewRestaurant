@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="title='Home'">
+<body>
+    <div layout:fragment="content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>Welcome to Our Restaurant</h1>
+                <p class="lead">Experience the finest dining with our exquisite menu and warm hospitality</p>
+                <a href="/menu" class="btn btn-primary btn-lg mt-3">View Our Menu</a>
+            </div>
+        </section>
+
+        <!-- Featured Dishes -->
+        <section class="container">
+            <div class="section-title">
+                <h2>Our Specialties</h2>
+                <p>Discover our chef's recommendations</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="/images/dish1.jpg" class="card-img-top" alt="Grilled Salmon">
+                        <div class="card-body">
+                            <h5 class="card-title">Grilled Salmon</h5>
+                            <p class="card-text">Fresh Atlantic salmon with lemon butter sauce, served with seasonal vegetables.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">$24.99</span>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Add to Order</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="/images/dish2.jpg" class="card-img-top" alt="Filet Mignon">
+                        <div class="card-body">
+                            <h5 class="card-title">Filet Mignon</h5>
+                            <p class="card-text">8oz tender beef filet with red wine reduction and truffle mashed potatoes.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">$32.99</span>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Add to Order</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="/images/dish3.jpg" class="card-img-top" alt="Mushroom Risotto">
+                        <div class="card-body">
+                            <h5 class="card-title">Mushroom Risotto</h5>
+                            <p class="card-text">Creamy arborio rice with wild mushrooms and parmesan cheese.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">$18.99</span>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Add to Order</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="py-5 bg-light mt-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2>Our Story</h2>
+                        <p>Founded in 2000, our restaurant has been serving delicious meals made from the finest ingredients. Our chefs bring years of experience and passion to every dish they create.</p>
+                        <p>We believe in using locally-sourced, seasonal ingredients to create memorable dining experiences for our guests.</p>
+                        <a href="/about" class="btn btn-outline-secondary">Learn More</a>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="/images/restaurant-interior.jpg" alt="Restaurant Interior" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="py-5">
+            <div class="container">
+                <div class="section-title">
+                    <h2>What Our Guests Say</h2>
+                    <p>Hear from our satisfied customers</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-quote-left fa-2x text-muted mb-3"></i>
+                                <p class="card-text">"The food was absolutely amazing! The service was excellent and the atmosphere was perfect for our anniversary dinner."</p>
+                                <div class="mt-3">
+                                    <h5 class="mb-0">Sarah Johnson</h5>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-quote-left fa-2x text-muted mb-3"></i>
+                                <p class="card-text">"The best dining experience I've had in years. The steak was cooked to perfection and the wine selection was impressive."</p>
+                                <div class="mt-3">
+                                    <h5 class="mb-0">Michael Chen</h5>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-quote-left fa-2x text-muted mb-3"></i>
+                                <p class="card-text">"The atmosphere is wonderful and the food is even better. I highly recommend the seafood pasta - it's to die for!"</p>
+                                <div class="mt-3">
+                                    <h5 class="mb-0">Emily Rodriguez</h5>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

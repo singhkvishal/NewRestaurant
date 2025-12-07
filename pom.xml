@@ -94,6 +94,23 @@
             <version>3.2.1</version>
         </dependency>
         
+        <!-- MS Access Database -->
+        <dependency>
+            <groupId>com.healthmarketscience.jackcess</groupId>
+            <artifactId>jackcess</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ucanaccess</groupId>
+            <artifactId>ucanaccess</artifactId>
+            <version>5.0.1</version>
+        </dependency>
+        
         <!-- Stripe Java SDK -->
         <dependency>
             <groupId>com.stripe</groupId>
@@ -101,6 +118,14 @@
             <version>24.6.0</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>sourceforge</id>
+            <name>SourceForge Repository</name>
+            <url>https://sourceforge.net/projects/ucanaccess/files/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
